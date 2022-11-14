@@ -11,10 +11,9 @@ fn primesieve(max: usize) -> Vec<bool> {
     // Creating the full size vector is more efficient than creating a small one and incrementally adding to it
     let mut mask = vec![true; max];
 
+    // Manually mark 0 and 1 as non-prime
     mask[0] = false;
     mask[1] = false;
-
-    //println!("{:?}", mask);
 
     for n in 2..=(g_factor as usize) {
         // Check that the divisor is a prime
@@ -36,6 +35,8 @@ fn primesieve(max: usize) -> Vec<bool> {
 fn main() {
     let args: Vec<String> = env::args().collect();
 
+    // Program can optionally take a single argument, which sets the largest number that will be checked for primality
+    // By default this is set to 1000
     let search_end: usize = if args.len() > 1 {
         args[1].trim().parse().unwrap_or(1000)
     } else {
@@ -50,6 +51,7 @@ fn main() {
         }
     }
 
+    // Print a count of the number of primes found
     println!(
         "\n{} primes in total...",
         out.iter().filter(|x| **x).count()
