@@ -49,4 +49,9 @@ fn main() {
             println!("{n}");
         }
     }
+
+    println!(
+        "\n{} primes in total...",
+        out.iter().filter(|x| **x).count()
+    );
 }
