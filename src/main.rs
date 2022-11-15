@@ -1,4 +1,4 @@
-use std::env;
+use clap::Parser;
 
 fn primesieve(max: usize) -> Vec<bool> {
     println!("Searching for primes less than {max}");
@@ -32,28 +32,36 @@ fn primesieve(max: usize) -> Vec<bool> {
     mask
 }
 
+/// Simple program to calculate prime numbers using a sieve
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    /// Number to stop search at
+    #[arg(short, long, default_value_t = 1000)]
+    search_end: usize,
+
+    /// List all primes found
+    #[arg(short, long)]
+    list: bool,
+}
+
 fn main() {
-    let args: Vec<String> = env::args().collect();
+    let args = Args::parse();
 
-    // Program can optionally take a single argument, which sets the largest number that will be checked for primality
-    // By default this is set to 1000
-    let search_end: usize = if args.len() > 1 {
-        args[1].trim().parse().unwrap_or(1000)
-    } else {
-        1000
-    };
+    let out = primesieve(args.search_end);
 
-    let out = primesieve(search_end);
-
-    for (n, val) in out.iter().enumerate() {
-        if *val {
-            println!("{n}");
+    if args.list {
+        for (n, val) in out.iter().enumerate() {
+            if *val {
+                println!("{n}");
+            }
         }
     }
 
     // Print a count of the number of primes found
     println!(
-        "\n{} primes in total...",
-        out.iter().filter(|x| **x).count()
+        "\n{} primes smaller than {}",
+        out.iter().filter(|x| **x).count(),
+        args.search_end
     );
 }
