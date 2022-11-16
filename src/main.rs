@@ -16,7 +16,7 @@ fn primesieve(max: usize) -> Vec<bool> {
     mask[1] = false;
 
     for n in 2..=(g_factor as usize) {
-        for m in ((n*2)..max).step_by(n) {
+        for m in ((n * 2)..max).step_by(n) {
             mask[m] = false;
         }
     }
