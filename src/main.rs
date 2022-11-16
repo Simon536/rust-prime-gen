@@ -16,16 +16,8 @@ fn primesieve(max: usize) -> Vec<bool> {
     mask[1] = false;
 
     for n in 2..=(g_factor as usize) {
-        // Check that the divisor is a prime
-        if mask[n] {
-            for (m, p) in mask.iter_mut().enumerate().skip(n + 1) {
-                if !*p {
-                    continue;
-                }
-                if m % n == 0 {
-                    *p = false;
-                }
-            }
+        for m in (n..max).step_by(n) {
+            mask[m] = false;
         }
     }
 
