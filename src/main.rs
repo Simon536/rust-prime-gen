@@ -62,6 +62,13 @@ mod tests {
 fn main() {
     let args = Args::parse();
 
+    if args.search_end > 1_000_000_000_000 {
+        panic!(
+            "{} is too large. Max allowed value is 1,000,000,000,000.",
+            args.search_end
+        );
+    }
+
     let out = primesieve(args.search_end);
 
     if args.list {
