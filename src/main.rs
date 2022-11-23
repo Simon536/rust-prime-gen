@@ -24,6 +24,35 @@ fn primesieve(max: usize) -> Vec<bool> {
     mask
 }
 
+fn list_primes(max: usize) {
+    let out = primesieve(max);
+
+    for (n, val) in out.iter().enumerate() {
+        if *val {
+            println!("{n}");
+        }
+    }
+
+    // Print a count of the number of primes found
+    println!(
+        "\n{} primes smaller than {}",
+        out.iter().filter(|x| **x).count(),
+        max
+    );
+}
+
+fn count_primes(max: usize) -> usize {
+    let prime_vec = primesieve(if max < 1_000_000 { max } else { 1_000_000 });
+
+    let count = if max < 1_000_000 {
+        prime_vec.iter().filter(|x| **x).count()
+    } else {
+        todo!("Spawn threads here...");
+    };
+
+    count
+}
+
 /// Simple program to calculate prime numbers using a sieve
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -69,20 +98,18 @@ fn main() {
         );
     }
 
-    let out = primesieve(args.search_end);
-
-    if args.list {
-        for (n, val) in out.iter().enumerate() {
-            if *val {
-                println!("{n}");
-            }
-        }
+    if args.list && args.search_end > 1_000_000 {
+        panic!(
+            "{} is too large. Cannot list primes greater than 1,000,000. Choose a smaller number or remove the list flag.",
+            args.search_end
+        );
     }
 
-    // Print a count of the number of primes found
-    println!(
-        "\n{} primes smaller than {}",
-        out.iter().filter(|x| **x).count(),
-        args.search_end
-    );
+    if args.list {
+        list_primes(args.search_end);
+    } else {
+        let c = count_primes(args.search_end);
+
+        print!("There are {} primes smaller than {}", c, args.search_end);
+    }
 }
