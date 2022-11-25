@@ -1,11 +1,8 @@
 use clap::Parser;
+use std::thread::spawn;
 
 fn primesieve(max: usize) -> Vec<bool> {
-    println!("Searching for primes less than {max}");
-
     let g_factor = (max as f32).sqrt();
-
-    println!("Greatest factor is {g_factor}");
 
     // Create boolean vector
     // Creating the full size vector is more efficient than creating a small one and incrementally adding to it
@@ -22,6 +19,30 @@ fn primesieve(max: usize) -> Vec<bool> {
     }
 
     mask
+}
+
+fn primesieve_extended(min: usize, max: usize) -> usize {
+    let g_factor = (max as f32).sqrt() as usize;
+
+    let sieve = primesieve(g_factor + 1);
+
+    let mut mask = vec![true; max - min];
+
+    for (n, _) in sieve.iter().enumerate().take(g_factor + 1).skip(2) {
+        if sieve[n] {
+            let mut first = min + n - 1;
+            first -= first % n;
+
+            for m in (first..max).step_by(n) {
+                if m == n {
+                    continue;
+                }
+                mask[m - min] = false;
+            }
+        }
+    }
+
+    mask.iter().filter(|x| **x).count()
 }
 
 fn list_primes(max: usize) {
@@ -42,12 +63,14 @@ fn list_primes(max: usize) {
 }
 
 fn count_primes(max: usize) -> usize {
-    let prime_vec = primesieve(if max < 1_000_000 { max } else { 1_000_000 });
-
     let count = if max < 1_000_000 {
-        prime_vec.iter().filter(|x| **x).count()
+        primesieve(max).iter().filter(|x| **x).count()
     } else {
-        todo!("Spawn threads here...");
+        let t1 = spawn(move || primesieve_extended(2, max / 3));
+        let t2 = spawn(move || primesieve_extended(max / 3, (2 * max) / 3));
+        let t3 = spawn(move || primesieve_extended((2 * max) / 3, max));
+
+        t1.join().unwrap() + t2.join().unwrap() + t3.join().unwrap()
     };
 
     count
@@ -85,6 +108,11 @@ mod tests {
             ],
             primesieve(15)
         );
+    }
+
+    #[test]
+    fn sieve_range_count() {
+        assert_eq!(primesieve_extended(10, 50), 11);
     }
 }
 
