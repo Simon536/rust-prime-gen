@@ -10,8 +10,8 @@ fn test_prime_count() {
 fn test_prime_list() {
     assert_eq!(
         vec![
-            false, false, true, true, false, true, false, true, false, false, false, true,
-            false, true, false
+            false, false, true, true, false, true, false, true, false, false, false, true, false,
+            true, false
         ],
         primesieve(15)
     );
