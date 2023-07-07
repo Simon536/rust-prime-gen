@@ -1,6 +1,12 @@
 use clap::Parser;
 use std::thread::spawn;
 
+#[cfg(target_pointer_width = "32")]
+const MAX_VALUE: usize = usize::MAX - 1;
+
+#[cfg(target_pointer_width = "64")]
+const MAX_VALUE: usize = 0xFF_FFFF_FFFF;
+
 fn primesieve(max: usize) -> Vec<bool> {
     let g_factor = (max as f32).sqrt();
 
@@ -95,10 +101,16 @@ mod tests;
 fn main() {
     let args = Args::parse();
 
-    if args.search_end > 1_000_000_000_000 {
+    if args.search_end > MAX_VALUE {
         panic!(
-            "{} is too large. Max allowed value is 1,000,000,000,000.",
-            args.search_end
+            "{} is too large. Max allowed value on {}-bit systems is {}.",
+            args.search_end,
+            if cfg!(target_pointer_width = "64") {
+                64
+            } else {
+                32
+            },
+            MAX_VALUE
         );
     }
 
